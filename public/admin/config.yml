@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+backend:
+  name: github
+  repo: NikDoesSEO/lottery-tax-calculator
+  branch: main
+
+media_folder: public/media
+public_folder: /media
+
+collections:
+  - name: pages
+    label: Pages
+    folder: src/content/pages
+    create: true
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Body, name: body, widget: markdown }
