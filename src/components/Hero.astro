@@ -1,0 +1,49 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  variant?: 'home' | 'page' | 'guide';
+  date?: Date;
+}
+
+const {
+  eyebrow,
+  title,
+  description,
+  variant = 'page',
+  date,
+} = Astro.props;
+
+const titleClass =
+  variant === 'home' ? 'heading-h1' : variant === 'guide' ? 'heading-h1' : 'heading-h2';
+
+const containerClass = variant === 'home' ? 'py-24 md:py-32' : 'py-16 md:py-24';
+---
+
+<section class={`${containerClass}`}>
+  <div class="max-w-[75rem] mx-auto px-6">
+    <div class="max-w-3xl">
+      {eyebrow && (
+        <p class="text-xs font-medium uppercase tracking-[0.1em] text-brand-fg-muted mb-5">
+          {eyebrow}
+        </p>
+      )}
+      {date && (
+        <p class="inline-flex items-center gap-2 bg-brand-primary-a10 text-brand-fg rounded-brand px-3 py-1 text-xs font-medium mb-5">
+          <span class="w-1.5 h-1.5 rounded-full bg-brand-primary"></span>
+          {date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+        </p>
+      )}
+      <h1 class={`${titleClass} font-semibold mb-6`}>{title}</h1>
+      {description && (
+        <p class="text-xl md:text-2xl text-brand-fg-muted leading-relaxed">{description}</p>
+      )}
+      {Astro.slots.has('actions') && (
+        <div class="mt-8 flex flex-wrap gap-4">
+          <slot name="actions" />
+        </div>
+      )}
+    </div>
+  </div>
+</section>

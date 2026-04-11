@@ -1,0 +1,23 @@
+---
+interface Props {
+  href?: string;
+  class?: string;
+}
+const { href = '/', class: className = '' } = Astro.props;
+---
+
+<a href={href} class={`inline-flex items-center gap-3 group ${className}`} aria-label="Lottery Tax Calculator — home">
+  <span class="inline-flex h-12 w-12 items-center justify-center">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="#000" stroke-width="1.5">
+      <rect x="5" y="3" width="14" height="18" rx="2" ry="2" stroke="#000" fill="none"></rect>
+      <rect x="8" y="6" width="8" height="3" rx="0.5" ry="0.5" fill="#FFD500"></rect>
+      <circle cx="8" cy="12" r="1" fill="#000"></circle>
+      <circle cx="12" cy="12" r="1" fill="#000"></circle>
+      <circle cx="16" cy="12" r="1" fill="#000"></circle>
+      <circle cx="8" cy="16" r="1" fill="#000"></circle>
+      <circle cx="12" cy="16" r="1" fill="#000"></circle>
+      <circle cx="16" cy="16" r="1" fill="#000"></circle>
+    </svg>
+  </span>
+  <span class="text-lg font-medium leading-none">Lottery tax calculator</span>
+</a>

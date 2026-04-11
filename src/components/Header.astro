@@ -1,0 +1,85 @@
+---
+import { getEntry } from 'astro:content';
+import Logo from './Logo.astro';
+
+// Nav links come from the CMS-editable settings/nav.json file.
+// Falls back to defaults if the file is missing or empty.
+const navEntry = await getEntry('settings', 'nav');
+const navLinks = navEntry?.data.nav ?? [
+  { href: '/about', label: 'About' },
+  { href: '/faqs', label: 'FAQs' },
+  { href: '/guides', label: 'Guides' },
+];
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+
+<header class="border-b border-black/5 bg-brand-bg">
+  <div class="max-w-[75rem] mx-auto px-6 py-5 flex items-center justify-between">
+    <Logo />
+
+    <nav aria-label="Primary" class="hidden md:block">
+      <ul class="flex items-center gap-8 list-none m-0 p-0">
+        {navLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class:list={[
+                'text-base hover:opacity-70 transition-opacity',
+                isActive(link.href) && 'font-semibold underline underline-offset-8',
+              ]}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <button
+      type="button"
+      class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-brand hover:bg-brand-primary-a10 transition-colors"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      data-mobile-menu-toggle
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+        <line x1="1" y1="5" x2="23" y2="5"></line>
+        <line x1="1" y1="12" x2="23" y2="12"></line>
+        <line x1="1" y1="19" x2="23" y2="19"></line>
+      </svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="hidden md:hidden border-t border-black/5">
+    <nav aria-label="Mobile" class="max-w-[75rem] mx-auto px-6 py-4">
+      <ul class="flex flex-col gap-4 list-none m-0 p-0">
+        {navLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class:list={[
+                'block py-2 text-lg hover:opacity-70 transition-opacity',
+                isActive(link.href) && 'font-semibold',
+              ]}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-mobile-menu-toggle]');
+  const menu = document.getElementById('mobile-menu');
+  toggle?.addEventListener('click', () => {
+    const isOpen = menu?.classList.toggle('hidden') === false;
+    toggle.setAttribute('aria-expanded', String(isOpen));
+  });
+</script>

@@ -1,0 +1,64 @@
+---
+// Lightweight opt-in cookie consent banner.
+// Stores choice in localStorage. Fires a `cookie-consent` CustomEvent on window
+// with { detail: { granted: boolean } } so analytics scripts can gate themselves.
+---
+
+<div
+  id="cookie-banner"
+  class="fixed bottom-0 left-0 right-0 z-50 hidden bg-brand-bg border-t border-black/10 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]"
+  role="dialog"
+  aria-live="polite"
+  aria-label="Cookie consent"
+>
+  <div class="max-w-[75rem] mx-auto px-6 py-5 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+    <p class="text-sm text-brand-fg-muted flex-1 m-0">
+      We use cookies for analytics and to show relevant ads. You can accept or reject them.
+      See our <a href="/privacy" class="underline hover:no-underline text-brand-fg">privacy policy</a>.
+    </p>
+    <div class="flex gap-3 shrink-0">
+      <button
+        type="button"
+        data-cookie-deny
+        class="inline-flex items-center justify-center rounded-brand bg-brand-primary-a10 text-brand-fg font-semibold px-4 py-2 text-sm hover:bg-brand-primary-a20 border border-black/10 transition-colors"
+      >
+        Deny
+      </button>
+      <button
+        type="button"
+        data-cookie-accept
+        class="inline-flex items-center justify-center rounded-brand bg-brand-primary text-brand-fg font-semibold px-4 py-2 text-sm hover:bg-brand-primary-hover transition-colors"
+      >
+        Accept
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const KEY = 'cookie-consent-v1';
+  const banner = document.getElementById('cookie-banner');
+  const existing = localStorage.getItem(KEY);
+
+  if (!existing && banner) {
+    banner.classList.remove('hidden');
+  }
+
+  const emit = (granted: boolean) => {
+    localStorage.setItem(KEY, granted ? 'granted' : 'denied');
+    banner?.classList.add('hidden');
+    window.dispatchEvent(new CustomEvent('cookie-consent', { detail: { granted } }));
+  };
+
+  document.querySelector('[data-cookie-accept]')?.addEventListener('click', () => emit(true));
+  document.querySelector('[data-cookie-deny]')?.addEventListener('click', () => emit(false));
+
+  // Re-fire existing choice for late listeners.
+  if (existing) {
+    queueMicrotask(() =>
+      window.dispatchEvent(
+        new CustomEvent('cookie-consent', { detail: { granted: existing === 'granted' } })
+      )
+    );
+  }
+</script>

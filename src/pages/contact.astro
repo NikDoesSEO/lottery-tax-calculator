@@ -1,0 +1,89 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Prose from '../components/Prose.astro';
+import Button from '../components/Button.astro';
+
+const entry = await getEntry('pages', 'contact');
+const { Content } = entry ? await render(entry) : { Content: null };
+---
+
+<BaseLayout title="Contact us | Lottery Tax Calculator" description="Get in touch with the Lottery Tax Calculator team — feedback, issues or general questions.">
+  <Hero
+    variant="page"
+    title="Contact us"
+    description={entry?.data.description ?? "Get in touch — we'd love to hear from you."}
+  />
+
+  <section class="pb-24">
+    <div class="max-w-3xl mx-auto px-6">
+      {Content && (
+        <Prose class="mb-10">
+          <Content />
+        </Prose>
+      )}
+
+      <form
+        name="contact"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        class="space-y-5 bg-brand-bg-alt border border-black/10 rounded-brand p-6 md:p-8"
+      >
+        <input type="hidden" name="form-name" value="contact" />
+        <p class="hidden">
+          <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+        </p>
+
+        <div>
+          <label for="name" class="block text-sm font-medium mb-1">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            class="w-full rounded-brand border border-black/20 bg-white px-3 py-2.5 text-base focus:outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+          />
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium mb-1">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="w-full rounded-brand border border-black/20 bg-white px-3 py-2.5 text-base focus:outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+          />
+        </div>
+
+        <div>
+          <label for="reason" class="block text-sm font-medium mb-1">Reason</label>
+          <select
+            id="reason"
+            name="reason"
+            class="w-full rounded-brand border border-black/20 bg-white px-3 py-2.5 text-base focus:outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+          >
+            <option>Feedback</option>
+            <option>Issue with the website</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="message" class="block text-sm font-medium mb-1">Message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows="6"
+            required
+            class="w-full rounded-brand border border-black/20 bg-white px-3 py-2.5 text-base focus:outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+          ></textarea>
+        </div>
+
+        <Button type="submit" variant="primary" size="lg">Send message</Button>
+      </form>
+    </div>
+  </section>
+</BaseLayout>

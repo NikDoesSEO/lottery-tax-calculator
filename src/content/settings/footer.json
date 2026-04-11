@@ -1,0 +1,11 @@
+{
+  "footerLinks": [
+    { "label": "FAQs", "href": "/faqs" },
+    { "label": "Guides", "href": "/guides" },
+    { "label": "About", "href": "/about" },
+    { "label": "Terms", "href": "/terms" },
+    { "label": "Privacy", "href": "/privacy" },
+    { "label": "Contact", "href": "/contact" }
+  ],
+  "disclaimer": "This calculator provides estimates only and should not be considered official tax advice. Tax rates and rules may change over time. For the most accurate information, please consult your tax professional."
+}

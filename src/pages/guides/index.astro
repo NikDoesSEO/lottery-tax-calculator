@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import Card from '../../components/Card.astro';
+
+const guides = (await getCollection('guides'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout
+  title="UK Lottery Tax Guides | Tax Rules, Winnings & Planning"
+  description="In-depth guides on UK lottery tax rules: gift tax, inheritance tax, interest on winnings, syndicates, and winner's guides."
+>
+  <Hero
+    variant="page"
+    eyebrow="Guides"
+    title="Lottery tax guides"
+    description="Helpful resources covering key topics around UK lottery winnings. Easy-to-understand information for better decision making."
+  />
+
+  <section class="pb-24">
+    <div class="max-w-[75rem] mx-auto px-6">
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {guides.map((guide) => (
+          <Card
+            href={`/guides/${guide.id}`}
+            title={guide.data.title}
+            description={guide.data.description}
+            image={guide.data.heroImage}
+            imageAlt={guide.data.heroImageAlt}
+            category={guide.data.category}
+            date={guide.data.date}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

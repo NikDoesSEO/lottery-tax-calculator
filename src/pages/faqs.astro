@@ -1,0 +1,85 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Prose from '../components/Prose.astro';
+import { markdownToPlainText } from '../lib/markdown';
+
+const faqs = (await getCollection('faqs'))
+  .sort((a, b) => a.data.order - b.data.order);
+
+// Pre-render each FAQ's Content so we can emit it inside <details>
+const rendered = await Promise.all(
+  faqs.map(async (faq) => ({
+    faq,
+    Content: (await render(faq)).Content,
+  }))
+);
+
+// JSON-LD FAQPage schema generated from the collection.
+// Google's Rich Results spec wants human-readable text, not markdown syntax,
+// so strip markdown formatting before putting the body into `text`.
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.data.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: markdownToPlainText(faq.body ?? ''),
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="UK Lottery Tax FAQs | Common Questions About Lottery Winnings"
+  description="Answers to the most common questions about UK lottery tax, including gift tax, inheritance tax, interest on savings and syndicate rules."
+  jsonLd={faqSchema}
+>
+  <Hero
+    variant="page"
+    eyebrow="FAQs"
+    title="UK lottery tax FAQs"
+    description="Quick answers to the most common questions about how UK lottery winnings are taxed."
+  />
+
+  <section class="pb-24">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="divide-y divide-black/10 rounded-brand border border-black/10 overflow-hidden bg-brand-bg">
+        {rendered.map(({ faq, Content }) => (
+          <details class="group">
+            <summary class="flex items-center justify-between gap-4 cursor-pointer list-none p-6 hover:bg-brand-bg-alt transition-colors">
+              <span class="text-lg font-semibold pr-2">{faq.data.question}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="shrink-0 transition-transform group-open:rotate-45"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </summary>
+            <div class="px-6 pb-6">
+              <Prose>
+                <Content />
+              </Prose>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  summary::-webkit-details-marker { display: none; }
+</style>

@@ -1,17 +1,194 @@
 ---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Button from '../components/Button.astro';
+import Card from '../components/Card.astro';
+import Prose from '../components/Prose.astro';
+import LotteryTaxCalculator from '../components/LotteryTaxCalculator.tsx';
 
+// Pull the 3 most recent guides for the homepage grid.
+const latestGuides = (await getCollection('guides'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+// Pull the first 4 FAQs (by order) for the homepage teaser and pre-render
+// each one so the accordion can render proper HTML (not raw markdown).
+const teaserFaqEntries = (await getCollection('faqs'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 4);
+
+const teaserFaqs = await Promise.all(
+  teaserFaqEntries.map(async (faq) => ({
+    faq,
+    Content: (await render(faq)).Content,
+  }))
+);
+
+// Homepage JSON-LD: WebApplication + FinancialService
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    '@id': 'https://www.lotterytaxcalculator.co.uk/#calculator',
+    name: 'UK Lottery Tax Calculator',
+    url: 'https://www.lotterytaxcalculator.co.uk/',
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Any',
+    description:
+      'Calculate potential tax implications on UK lottery winnings including interest tax, inheritance tax, and gift tax',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+    featureList: [
+      'Calculate tax on interest earned from lottery winnings',
+      'Estimate inheritance tax implications',
+      'Calculate potential gift tax',
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FinancialService',
+    '@id': 'https://www.lotterytaxcalculator.co.uk/#service',
+    name: 'UK Lottery Tax Calculator Service',
+    serviceType: 'Tax Calculator',
+    provider: { '@id': 'https://www.lotterytaxcalculator.co.uk/#organization' },
+    areaServed: { '@type': 'Country', name: 'United Kingdom' },
+    description:
+      'Free online calculator for UK lottery winners to understand potential tax implications',
+  },
+];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="Lottery Tax Calculator | How Taxes on Winnings Work In The UK"
+  description="Free UK lottery tax calculator. Calculate potential tax implications of lottery winnings including interest tax, inheritance tax, and gift tax. 100% tax-free winnings explained."
+  jsonLd={jsonLd}
+>
+  <Hero
+    variant="home"
+    eyebrow="Estimate your Lottery Interest taxes for free"
+    title="UK Lottery Tax Calculator"
+    description="Congratulations on your lottery win — or perhaps you're just planning for that lucky day! While UK lottery winnings are completely tax-free when you first receive them, many winners don't realise that what happens next could still have tax implications."
+  >
+    <Button slot="actions" variant="primary" size="lg" href="#lottery-calculator">Jump to calculator</Button>
+    <Button slot="actions" variant="secondary" size="lg" href="/faqs">See all FAQs</Button>
+  </Hero>
+
+  <section id="lottery-calculator" class="py-20 bg-brand-bg-alt">
+    <div class="max-w-[75rem] mx-auto px-6">
+      <div class="max-w-3xl mb-10">
+        <h2 class="heading-h2 font-semibold mb-3">Making the most of this calculator</h2>
+        <p class="text-xl text-brand-fg-muted">
+          Enter your winning amount, expected interest rate, tax bracket, and planned gifts, then click
+          Calculate your tax to get your personalised results.
+        </p>
+        <p class="text-sm text-brand-fg-muted italic mt-4">
+          Disclaimer: This calculator provides estimates only and should not be considered financial advice.
+          Tax rules may change. Please consult with a qualified tax professional for advice specific to your situation.
+        </p>
+      </div>
+      <LotteryTaxCalculator client:load />
+    </div>
+  </section>
+
+  <section class="py-20">
+    <div class="max-w-[75rem] mx-auto px-6">
+      <h2 class="heading-h2 font-semibold mb-3">Understanding your lottery tax</h2>
+      <p class="text-xl text-brand-fg-muted max-w-3xl mb-10">
+        In the UK, all lottery winnings — whether it's the National Lottery, EuroMillions, or scratch cards — are entirely tax-free.
+        But once that money is in your account, several tax considerations come into play.
+      </p>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <div class="p-6 rounded-brand bg-brand-bg-alt border border-black/5">
+          <h3 class="text-lg font-semibold mb-2">Interest on your winnings</h3>
+          <p class="text-brand-fg-muted">
+            When your jackpot sits in a savings account earning interest, that interest could be taxable depending on your tax bracket.
+          </p>
+        </div>
+        <div class="p-6 rounded-brand bg-brand-bg-alt border border-black/5">
+          <h3 class="text-lg font-semibold mb-2">Inheritance tax</h3>
+          <p class="text-brand-fg-muted">
+            Your winnings become part of your estate and may be subject to inheritance tax above the £325,000 threshold.
+          </p>
+        </div>
+        <div class="p-6 rounded-brand bg-brand-bg-alt border border-black/5">
+          <h3 class="text-lg font-semibold mb-2">Gift tax implications</h3>
+          <p class="text-brand-fg-muted">
+            Gifting winnings to family could trigger inheritance tax if you die within 7 years (taper relief applies).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 bg-brand-bg-alt">
+    <div class="max-w-[75rem] mx-auto px-6">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-10">
+        <div>
+          <h2 class="heading-h2 font-semibold mb-3">Latest guides</h2>
+          <p class="text-xl text-brand-fg-muted">Helpful resources covering key topics.</p>
+        </div>
+        <Button variant="secondary" href="/guides">See all guides</Button>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {latestGuides.map((guide) => (
+          <Card
+            href={`/guides/${guide.id}`}
+            title={guide.data.title}
+            description={guide.data.description}
+            image={guide.data.heroImage}
+            imageAlt={guide.data.heroImageAlt}
+            category={guide.data.category}
+            date={guide.data.date}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20">
+    <div class="max-w-[75rem] mx-auto px-6">
+      <div class="max-w-3xl">
+        <h2 class="heading-h2 font-semibold mb-3">Frequently asked questions</h2>
+        <p class="text-xl text-brand-fg-muted mb-10">Quick answers to the most common questions.</p>
+
+        <div class="divide-y divide-black/10 rounded-brand border border-black/10 overflow-hidden bg-brand-bg mb-8">
+          {teaserFaqs.map(({ faq, Content }) => (
+            <details class="group">
+              <summary class="flex items-center justify-between gap-4 cursor-pointer list-none p-6 hover:bg-brand-bg-alt transition-colors">
+                <span class="text-lg font-semibold pr-2">{faq.data.question}</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="shrink-0 transition-transform group-open:rotate-45"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </summary>
+              <div class="px-6 pb-6">
+                <Prose>
+                  <Content />
+                </Prose>
+              </div>
+            </details>
+          ))}
+        </div>
+
+        <Button variant="secondary" href="/faqs">See all FAQs</Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  summary::-webkit-details-marker { display: none; }
+</style>

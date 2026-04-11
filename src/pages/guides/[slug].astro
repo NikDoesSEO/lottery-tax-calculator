@@ -1,0 +1,141 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Prose from '../../components/Prose.astro';
+import Card from '../../components/Card.astro';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides');
+  return guides.map((guide) => ({
+    params: { slug: guide.id },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props;
+const { Content } = await render(guide);
+
+// Related guides: other entries in the same category, fallback to most recent
+const allGuides = (await getCollection('guides'))
+  .filter((g) => g.id !== guide.id)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const related = (
+  guide.data.category
+    ? allGuides.filter((g) => g.data.category === guide.data.category)
+    : []
+).concat(allGuides.filter((g) => g.data.category !== guide.data.category))
+  .slice(0, 3);
+
+const siteUrl = 'https://www.lotterytaxcalculator.co.uk/';
+const guideUrl = `${siteUrl}guides/${guide.id}`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: guide.data.title,
+    description: guide.data.description,
+    image: guide.data.heroImage ? new URL(guide.data.heroImage, siteUrl).toString() : undefined,
+    datePublished: guide.data.date.toISOString(),
+    author: { '@type': 'Organization', name: 'Lottery Tax Calculator' },
+    publisher: { '@id': `${siteUrl}#organization` },
+    mainEntityOfPage: guideUrl,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+      { '@type': 'ListItem', position: 2, name: 'Guides', item: `${siteUrl}guides` },
+      { '@type': 'ListItem', position: 3, name: guide.data.title, item: guideUrl },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={guide.data.title}
+  description={guide.data.description}
+  ogImage={guide.data.heroImage}
+  jsonLd={jsonLd}
+>
+  <article>
+    <header class="py-16 md:py-20">
+      <div class="max-w-3xl mx-auto px-6">
+        {guide.data.category && (
+          <p class="text-xs font-medium uppercase tracking-[0.1em] text-brand-fg-muted mb-4">
+            {guide.data.category}
+          </p>
+        )}
+        <h1 class="heading-h1 font-semibold mb-6 leading-[1.1]">{guide.data.title}</h1>
+        <p class="text-xl md:text-2xl text-brand-fg-muted leading-relaxed mb-6">
+          {guide.data.description}
+        </p>
+        <p class="inline-flex items-center gap-2 bg-brand-primary-a10 text-brand-fg rounded-brand px-3 py-1 text-xs font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-brand-primary"></span>
+          {guide.data.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+        </p>
+      </div>
+    </header>
+
+    {guide.data.heroImage && (
+      <div class="max-w-5xl mx-auto px-6 mb-12 md:mb-16">
+        <img
+          src={guide.data.heroImage}
+          alt={guide.data.heroImageAlt ?? ''}
+          class="w-full rounded-brand aspect-[16/9] object-cover"
+          loading="eager"
+        />
+      </div>
+    )}
+
+    {guide.data.keyInsights && guide.data.keyInsights.length > 0 && (
+      <aside class="max-w-3xl mx-auto px-6 mb-12">
+        <div class="bg-brand-primary-a10 border border-brand-primary-a30 rounded-brand p-6 md:p-8">
+          <h2 class="text-xl font-semibold mb-4">Key insights</h2>
+          <ul class="list-disc pl-5 space-y-2 text-brand-fg text-base leading-relaxed">
+            {guide.data.keyInsights.map((insight) => {
+              // Safely render **bold** syntax by splitting on the pattern
+              // rather than injecting HTML. This prevents stored XSS if an
+              // editor pastes HTML or script tags in the CMS.
+              const parts = insight.split(/\*\*(.*?)\*\*/);
+              return (
+                <li>
+                  {parts.map((part, i) => (i % 2 === 1 ? <strong>{part}</strong> : part))}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </aside>
+    )}
+
+    <div class="max-w-3xl mx-auto px-6 pb-20">
+      <Prose>
+        <Content />
+      </Prose>
+    </div>
+  </article>
+
+  {related.length > 0 && (
+    <section class="py-20 bg-brand-bg-alt">
+      <div class="max-w-[75rem] mx-auto px-6">
+        <h2 class="heading-h3 font-semibold mb-8">Related guides</h2>
+        <div class="grid gap-6 md:grid-cols-3">
+          {related.map((g) => (
+            <Card
+              href={`/guides/${g.id}`}
+              title={g.data.title}
+              description={g.data.description}
+              image={g.data.heroImage}
+              imageAlt={g.data.heroImageAlt}
+              category={g.data.category}
+              date={g.data.date}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>

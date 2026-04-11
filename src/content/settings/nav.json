@@ -1,0 +1,7 @@
+{
+  "nav": [
+    { "label": "About", "href": "/about" },
+    { "label": "FAQs", "href": "/faqs" },
+    { "label": "Guides", "href": "/guides" }
+  ]
+}

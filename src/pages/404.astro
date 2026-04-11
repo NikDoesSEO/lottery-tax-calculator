@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+---
+
+<BaseLayout title="Page not found | Lottery Tax Calculator" noindex>
+  <section class="py-32">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <p class="text-xs font-medium uppercase tracking-[0.1em] text-brand-fg-muted mb-5">404</p>
+      <h1 class="heading-h1 font-semibold mb-6">Page not found</h1>
+      <p class="text-xl text-brand-fg-muted mb-10">
+        The page you're looking for doesn't exist. Try heading back to the calculator or browsing our guides.
+      </p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <Button variant="primary" size="lg" href="/">Back to calculator</Button>
+        <Button variant="secondary" size="lg" href="/guides">Browse guides</Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

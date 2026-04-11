@@ -1,0 +1,47 @@
+---
+import { getEntry } from 'astro:content';
+import Logo from './Logo.astro';
+
+// Footer links + disclaimer come from the CMS-editable settings/footer.json file.
+const footerEntry = await getEntry('settings', 'footer');
+const footerLinks = footerEntry?.data.footerLinks ?? [
+  { href: '/faqs', label: 'FAQs' },
+  { href: '/guides', label: 'Guides' },
+  { href: '/about', label: 'About' },
+  { href: '/terms', label: 'Terms' },
+  { href: '/privacy', label: 'Privacy' },
+  { href: '/contact', label: 'Contact' },
+];
+const disclaimer =
+  footerEntry?.data.disclaimer ??
+  'This calculator provides estimates only and should not be considered official tax advice. Tax rates and rules may change over time. For the most accurate information, please consult your tax professional.';
+---
+
+<footer class="bg-brand-bg-alt border-t border-black/5 mt-24">
+  <div class="max-w-[75rem] mx-auto px-6 py-16">
+    <div class="grid gap-10 md:grid-cols-[1fr_2fr] items-start">
+      <Logo />
+
+      <nav aria-label="Footer">
+        <ul class="grid grid-cols-2 sm:grid-cols-3 gap-4 list-none m-0 p-0">
+          {footerLinks.map((link) => (
+            <li>
+              <a href={link.href} class="inline-block py-1 text-base hover:opacity-70 transition-opacity">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+
+    <p class="mt-12 text-sm italic text-brand-fg-muted max-w-prose">
+      {disclaimer} For the latest and most accurate information regarding taxes, please visit
+      <a href="https://www.gov.uk/browse/tax/income-tax" target="_blank" rel="noopener noreferrer" class="underline hover:no-underline">HMRC</a>.
+    </p>
+
+    <p class="mt-6 text-sm text-brand-fg-muted">
+      © {new Date().getFullYear()} Lottery Tax Calculator. All rights reserved.
+    </p>
+  </div>
+</footer>

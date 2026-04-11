@@ -4,14 +4,101 @@ backend:
   repo: NikDoesSEO/lottery-tax-calculator
   branch: main
 
-media_folder: public/media
-public_folder: /media
+media_folder: public/images
+public_folder: /images
+
+site_url: https://www.lotterytaxcalculator.co.uk
+display_url: https://www.lotterytaxcalculator.co.uk
 
 collections:
-  - name: pages
-    label: Pages
-    folder: src/content/pages
+  - name: guides
+    label: Guides
+    label_singular: Guide
+    description: Long-form articles on UK lottery tax topics.
+    folder: src/content/guides
     create: true
+    slug: "{{slug}}"
+    sortable_fields: [date, title]
+    view_filters:
+      - label: Recent
+        field: date
+        pattern: "2026"
     fields:
       - { label: Title, name: title, widget: string }
+      - { label: Description, name: description, widget: text, hint: "Shown on cards and in search result meta description." }
+      - { label: Date, name: date, widget: datetime, picker_utc: false }
+      - { label: Category, name: category, widget: string, required: false }
+      - { label: Hero Image, name: heroImage, widget: image, required: false, media_library: { config: { multiple: false } } }
+      - { label: Hero Image Alt Text, name: heroImageAlt, widget: string, required: false }
+      - label: Key Insights
+        name: keyInsights
+        widget: list
+        required: false
+        hint: "Bullet list shown as a callout near the top of the article."
+        field: { label: Insight, name: insight, widget: string }
       - { label: Body, name: body, widget: markdown }
+
+  - name: faqs
+    label: FAQs
+    label_singular: FAQ
+    description: Individual questions and answers shown on the FAQ page.
+    folder: src/content/faqs
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [order, question]
+    fields:
+      - { label: Question, name: question, widget: string }
+      - { label: Display Order, name: order, widget: number, default: 0, hint: "Lower numbers appear first." }
+      - { label: Category, name: category, widget: string, required: false }
+      - { label: Answer, name: body, widget: markdown }
+
+  - name: pages
+    label: Pages
+    label_singular: Page
+    description: Static pages (About, Privacy, Terms, etc.)
+    folder: src/content/pages
+    create: false
+    slug: "{{slug}}"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Description, name: description, widget: text }
+      - { label: Updated, name: updated, widget: datetime, required: false }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: settings
+    label: Site settings
+    files:
+      - name: site
+        label: Site metadata
+        file: src/content/settings/site.json
+        fields:
+          - { label: Site name, name: siteName, widget: string }
+          - { label: Default description, name: defaultDescription, widget: text }
+          - { label: OG image, name: ogImage, widget: image, required: false }
+          - { label: Contact email, name: contactEmail, widget: string, required: false }
+          - { label: GA4 ID, name: ga4Id, widget: string, required: false }
+          - { label: AdSense client, name: adSenseClient, widget: string, required: false }
+          - { label: Ahrefs key, name: ahrefsKey, widget: string, required: false }
+
+      - name: nav
+        label: Header navigation
+        file: src/content/settings/nav.json
+        fields:
+          - label: Menu links
+            name: nav
+            widget: list
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: URL, name: href, widget: string }
+
+      - name: footer
+        label: Footer
+        file: src/content/settings/footer.json
+        fields:
+          - label: Footer links
+            name: footerLinks
+            widget: list
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: URL, name: href, widget: string }
+          - { label: Disclaimer, name: disclaimer, widget: text }

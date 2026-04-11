@@ -1,0 +1,190 @@
+---
+import { getEntry } from 'astro:content';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import CookieBanner from '../components/CookieBanner.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
+}
+
+// Pull site-wide settings from the content collection so they're CMS-editable.
+const siteSettings = await getEntry('settings', 'site');
+const settings = siteSettings?.data ?? {};
+
+const defaultDescription =
+  settings.defaultDescription ??
+  'Free UK lottery tax calculator. Calculate potential tax implications of lottery winnings including interest tax, inheritance tax, and gift tax.';
+
+const {
+  title,
+  description = defaultDescription,
+  canonical,
+  ogImage = settings.ogImage ?? '/images/homepage-uk-lottery-preview-og.webp',
+  noindex = false,
+  jsonLd,
+} = Astro.props;
+
+const siteUrl = Astro.site?.toString() ?? 'https://www.lotterytaxcalculator.co.uk/';
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).toString();
+const ogImageUrl = new URL(ogImage, siteUrl).toString();
+const siteName = settings.siteName ?? 'Lottery Tax Calculator';
+
+// Always-on global JSON-LD: Organization + WebSite
+const globalJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${siteUrl}#organization`,
+    name: siteName,
+    url: siteUrl,
+    logo: new URL('/favicon-256.png', siteUrl).toString(),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${siteUrl}#website`,
+    name: siteName,
+    url: siteUrl,
+    publisher: { '@id': `${siteUrl}#organization` },
+    inLanguage: 'en-GB',
+  },
+];
+
+const allJsonLd = jsonLd
+  ? [...globalJsonLd, ...(Array.isArray(jsonLd) ? jsonLd : [jsonLd])]
+  : globalJsonLd;
+
+const ga4Id = settings.ga4Id;
+const adSenseClient = settings.adSenseClient;
+const ahrefsKey = settings.ahrefsKey;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex
+      ? <meta name="robots" content="noindex, nofollow" />
+      : <meta name="robots" content="index, follow, max-image-preview:large" />
+    }
+
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:locale" content="en_GB" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/webclip.png" />
+
+    <!-- Rethink Sans font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;500;600;700&display=swap"
+    />
+
+    <!-- JSON-LD structured data -->
+    {allJsonLd.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+
+    <!-- Google Analytics 4 with Consent Mode v2 — gated by cookie banner -->
+    {ga4Id && (
+      <Fragment>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}></script>
+        <script is:inline define:vars={{ ga4Id }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
+
+          // Consent mode: default to denied until user opts in.
+          gtag('consent', 'default', {
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            analytics_storage: 'denied',
+            wait_for_update: 500,
+          });
+
+          gtag('js', new Date());
+          gtag('config', ga4Id, { anonymize_ip: true });
+
+          // Grant consent if cookie banner fires (or was previously granted).
+          window.addEventListener('cookie-consent', (e) => {
+            const granted = e.detail && e.detail.granted;
+            gtag('consent', 'update', {
+              ad_storage: granted ? 'granted' : 'denied',
+              ad_user_data: granted ? 'granted' : 'denied',
+              ad_personalization: granted ? 'granted' : 'denied',
+              analytics_storage: granted ? 'granted' : 'denied',
+            });
+          });
+        </script>
+      </Fragment>
+    )}
+
+    <!-- Ahrefs analytics -->
+    {ahrefsKey && (
+      <script async src="https://analytics.ahrefs.com/analytics.js" data-key={ahrefsKey}></script>
+    )}
+
+    <!-- Google AdSense — only loaded after the user grants cookie consent (GDPR) -->
+    {adSenseClient && (
+      <script is:inline define:vars={{ adSenseClient }}>
+        (function () {
+          const SRC = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + adSenseClient;
+          let loaded = false;
+          function loadAdsense() {
+            if (loaded) return;
+            loaded = true;
+            const s = document.createElement('script');
+            s.async = true;
+            s.src = SRC;
+            s.crossOrigin = 'anonymous';
+            document.head.appendChild(s);
+          }
+          // If consent was previously granted, load immediately on the next tick.
+          if (localStorage.getItem('cookie-consent-v1') === 'granted') {
+            queueMicrotask(loadAdsense);
+          }
+          // Otherwise wait for the cookie banner to fire.
+          window.addEventListener('cookie-consent', (e) => {
+            if (e.detail && e.detail.granted) loadAdsense();
+          });
+        })();
+      </script>
+    )}
+  </head>
+  <body class="bg-brand-bg text-brand-fg font-sans flex flex-col min-h-screen">
+    <Header />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+    <CookieBanner />
+  </body>
+</html>

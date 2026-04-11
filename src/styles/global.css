@@ -1,0 +1,129 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Brand colors (extracted from Webflow design tokens) */
+  --color-brand-primary: #fee539;          /* Bright yellow — CTAs, buttons */
+  --color-brand-primary-hover: #f9d901;    /* Darker yellow on hover / text-on-dark */
+  --color-brand-primary-soft: #fbefaf;     /* Pale yellow — secondary surfaces */
+  --color-brand-primary-softer: #fefbe9;   /* Lighter pale yellow */
+  --color-brand-accent: #2800ac;           /* Deep purple — borders, inverse, emphasis */
+  --color-brand-accent-hover: #2a0085;     /* Darker purple */
+
+  --color-brand-bg: #ffffff;               /* Primary background */
+  --color-brand-bg-alt: #f8f4ee;           /* Warm off-white — secondary sections */
+  --color-brand-fg: #000000;               /* Primary text */
+  --color-brand-fg-muted: rgba(0, 0, 0, 0.6); /* Secondary text */
+
+  /* Tint scale for yellow primary (opacity variants from Webflow) */
+  --color-brand-primary-a10: rgba(249, 217, 1, 0.1);
+  --color-brand-primary-a20: rgba(249, 217, 1, 0.2);
+  --color-brand-primary-a30: rgba(249, 217, 1, 0.3);
+  --color-brand-primary-a50: rgba(249, 217, 1, 0.5);
+
+  /* Typography */
+  --font-sans: "Rethink Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+  /* Type scale — from Webflow rem values */
+  --text-h0: 7.99rem;
+  --text-h0--line-height: 1.04;
+  --text-h0--letter-spacing: -0.01em;
+
+  --text-h1: 5.65rem;
+  --text-h1--line-height: 1.04;
+  --text-h1--letter-spacing: -0.01em;
+
+  --text-h2: 2.83rem;
+  --text-h2--line-height: 1.04;
+  --text-h2--letter-spacing: -0.01em;
+
+  --text-h3: 2rem;
+  --text-h3--line-height: 1.04;
+  --text-h3--letter-spacing: -0.01em;
+
+  --text-h4: 1.41rem;
+  --text-h4--line-height: 1.3;
+  --text-h4--letter-spacing: -0.01em;
+
+  --text-h5: 1rem;
+  --text-h5--line-height: 1.3;
+
+  --text-h6: 0.71rem;
+  --text-h6--line-height: 1.3;
+  --text-h6--letter-spacing: 0.1em;
+
+  --text-body-lg: 1.25rem;
+  --text-body-lg--line-height: 1.6;
+
+  /* Spacing scale — Webflow's x-based scale in rem */
+  --spacing-x-025: 0.25rem;
+  --spacing-x-05: 0.5rem;
+  --spacing-x-075: 0.75rem;
+  --spacing-x-1: 1rem;
+  --spacing-x-125: 1.25rem;
+  --spacing-x-15: 1.5rem;
+  --spacing-x-175: 1.75rem;
+  --spacing-x-2: 2rem;
+  --spacing-x-3: 3rem;
+  --spacing-x-4: 4rem;
+  --spacing-x-5: 5rem;
+  --spacing-x-6: 6rem;
+  --spacing-x-7: 7rem;
+  --spacing-x-8: 8rem;
+
+  /* Containers */
+  --container-prose: 42rem;
+  --container-page: 75rem;
+
+  /* Radii */
+  --radius-brand: 0.25rem; /* 4px — consistent across buttons, cards, inputs */
+}
+
+/* Global base layer */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-brand-fg);
+    background-color: var(--color-brand-bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.1;
+  }
+}
+
+/* Responsive heading utilities — Webflow scales headings down by ~20% per breakpoint */
+@layer utilities {
+  .heading-h1 {
+    font-size: var(--text-h1);
+    line-height: var(--text-h1--line-height);
+    letter-spacing: var(--text-h1--letter-spacing);
+  }
+  @media (max-width: 991px) { .heading-h1 { font-size: 4.52rem; } }
+  @media (max-width: 767px) { .heading-h1 { font-size: 3.62rem; } }
+  @media (max-width: 479px) { .heading-h1 { font-size: 2.89rem; } }
+
+  .heading-h2 {
+    font-size: var(--text-h2);
+    line-height: var(--text-h2--line-height);
+    letter-spacing: var(--text-h2--letter-spacing);
+  }
+  @media (max-width: 991px) { .heading-h2 { font-size: 2.26rem; } }
+  @media (max-width: 767px) { .heading-h2 { font-size: 1.81rem; } }
+  @media (max-width: 479px) { .heading-h2 { font-size: 1.45rem; } }
+
+  .heading-h3 {
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+    letter-spacing: var(--text-h3--letter-spacing);
+  }
+  @media (max-width: 991px) { .heading-h3 { font-size: 1.6rem; } }
+  @media (max-width: 767px) { .heading-h3 { font-size: 1.28rem; } }
+}

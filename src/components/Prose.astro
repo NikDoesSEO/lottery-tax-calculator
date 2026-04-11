@@ -1,0 +1,76 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`prose prose-lg max-w-none ${className}`}>
+  <slot />
+</div>
+
+<style is:global>
+  .prose {
+    color: var(--color-brand-fg);
+    font-family: var(--font-sans);
+  }
+  .prose h2 {
+    font-size: var(--text-h2);
+    line-height: var(--text-h2--line-height);
+    letter-spacing: var(--text-h2--letter-spacing);
+    font-weight: 600;
+    margin-top: 3rem;
+    margin-bottom: 1.25rem;
+  }
+  .prose h3 {
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+    letter-spacing: var(--text-h3--letter-spacing);
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .prose h4 {
+    font-size: var(--text-h4);
+    line-height: var(--text-h4--line-height);
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  .prose p {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+    color: var(--color-brand-fg);
+  }
+  .prose a {
+    color: var(--color-brand-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose a:hover {
+    text-decoration: none;
+  }
+  .prose ul, .prose ol {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .prose ul { list-style: disc; }
+  .prose ol { list-style: decimal; }
+  .prose li { margin-bottom: 0.5rem; }
+  .prose strong { font-weight: 600; }
+  .prose blockquote {
+    border-left: 4px solid var(--color-brand-primary);
+    padding-left: 1.25rem;
+    font-style: italic;
+    color: var(--color-brand-fg-muted);
+  }
+  .prose code {
+    background-color: var(--color-brand-primary-a10);
+    padding: 0.1rem 0.3rem;
+    border-radius: 0.25rem;
+    font-size: 0.95em;
+  }
+</style>
