@@ -24,8 +24,8 @@ collections:
         field: date
         pattern: "2026"
     fields:
-      - { label: Title, name: title, widget: string }
-      - { label: Description, name: description, widget: text, hint: "Shown on cards and in search result meta description." }
+      - { label: Title, name: title, widget: string, hint: "Shown as the page H1 and used as the default <title> tag." }
+      - { label: Description, name: description, widget: text, hint: "Shown on cards and under the H1. Used as the default meta description unless overridden in SEO." }
       - { label: Date, name: date, widget: datetime, picker_utc: false }
       - { label: Category, name: category, widget: string, required: false }
       - { label: Hero Image, name: heroImage, widget: image, required: false, media_library: { config: { multiple: false } } }
@@ -37,6 +37,17 @@ collections:
         hint: "Bullet list shown as a callout near the top of the article."
         field: { label: Insight, name: insight, widget: string }
       - { label: Body, name: body, widget: markdown }
+      - label: SEO
+        name: seo
+        widget: object
+        required: false
+        collapsed: true
+        hint: "Optional overrides. Leave empty to use the Title and Description above, and a self-referring canonical URL."
+        fields:
+          - { label: "Meta title (overrides <title>)", name: metaTitle, widget: string, required: false, hint: "Shown in browser tabs and search results. Defaults to the page Title." }
+          - { label: "Meta description (overrides meta description)", name: metaDescription, widget: text, required: false, hint: "Defaults to the page Description." }
+          - { label: "Canonical URL", name: canonical, widget: string, required: false, hint: "Leave empty for a self-referring canonical. Only override if this page should canonicalize to a different URL." }
+          - { label: "Hide from search engines (noindex)", name: noindex, widget: boolean, required: false, default: false }
 
   - name: faqs
     label: FAQs
@@ -60,10 +71,21 @@ collections:
     create: false
     slug: "{{slug}}"
     fields:
-      - { label: Title, name: title, widget: string }
-      - { label: Description, name: description, widget: text }
+      - { label: Title, name: title, widget: string, hint: "Shown as the page H1 and used as the default <title> tag." }
+      - { label: Description, name: description, widget: text, hint: "Shown under the H1. Used as the default meta description unless overridden in SEO." }
       - { label: Updated, name: updated, widget: datetime, required: false }
       - { label: Body, name: body, widget: markdown }
+      - label: SEO
+        name: seo
+        widget: object
+        required: false
+        collapsed: true
+        hint: "Optional overrides. Leave empty to use the Title and Description above, and a self-referring canonical URL."
+        fields:
+          - { label: "Meta title (overrides <title>)", name: metaTitle, widget: string, required: false }
+          - { label: "Meta description (overrides meta description)", name: metaDescription, widget: text, required: false }
+          - { label: "Canonical URL", name: canonical, widget: string, required: false, hint: "Leave empty for a self-referring canonical." }
+          - { label: "Hide from search engines (noindex)", name: noindex, widget: boolean, required: false, default: false }
 
   - name: settings
     label: Site settings

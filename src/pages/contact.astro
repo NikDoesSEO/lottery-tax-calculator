@@ -9,7 +9,12 @@ const entry = await getEntry('pages', 'contact');
 const { Content } = entry ? await render(entry) : { Content: null };
 ---
 
-<BaseLayout title="Contact us | Lottery Tax Calculator" description="Get in touch with the Lottery Tax Calculator team — feedback, issues or general questions.">
+<BaseLayout
+  title={entry?.data.seo?.metaTitle || "Contact us | Lottery Tax Calculator"}
+  description={entry?.data.seo?.metaDescription || entry?.data.description || "Get in touch with the Lottery Tax Calculator team — feedback, issues or general questions."}
+  canonical={entry?.data.seo?.canonical}
+  noindex={entry?.data.seo?.noindex ?? false}
+>
   <Hero
     variant="page"
     title="Contact us"

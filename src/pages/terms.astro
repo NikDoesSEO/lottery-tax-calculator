@@ -9,7 +9,12 @@ if (!entry) throw new Error('Missing pages/terms.md content');
 const { Content } = await render(entry);
 ---
 
-<BaseLayout title={entry.data.title} description={entry.data.description}>
+<BaseLayout
+  title={entry.data.seo?.metaTitle || entry.data.title}
+  description={entry.data.seo?.metaDescription || entry.data.description}
+  canonical={entry.data.seo?.canonical}
+  noindex={entry.data.seo?.noindex ?? false}
+>
   <Hero variant="page" title={entry.data.title} description={entry.data.description} />
   <section class="pb-24">
     <div class="max-w-3xl mx-auto px-6">

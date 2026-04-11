@@ -1,6 +1,18 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+// Per-entry SEO overrides. All optional — empty fields fall back to the
+// visible `title` / `description` for meta tags and to a self-referring
+// canonical URL. Editors can override any of these in the CMS.
+const seoSchema = z
+  .object({
+    metaTitle: z.string().optional(),
+    metaDescription: z.string().optional(),
+    canonical: z.string().url().optional(),
+    noindex: z.boolean().optional(),
+  })
+  .optional();
+
 const guides = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/guides' }),
   schema: z.object({
@@ -11,6 +23,7 @@ const guides = defineCollection({
     heroImageAlt: z.string().optional(),
     category: z.string().optional(),
     keyInsights: z.array(z.string()).optional(),
+    seo: seoSchema,
   }),
 });
 
@@ -29,6 +42,7 @@ const pages = defineCollection({
     title: z.string(),
     description: z.string(),
     updated: z.coerce.date().optional(),
+    seo: seoSchema,
   }),
 });
 

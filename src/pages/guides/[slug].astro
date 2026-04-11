@@ -55,8 +55,10 @@ const jsonLd = [
 ---
 
 <BaseLayout
-  title={guide.data.title}
-  description={guide.data.description}
+  title={guide.data.seo?.metaTitle || guide.data.title}
+  description={guide.data.seo?.metaDescription || guide.data.description}
+  canonical={guide.data.seo?.canonical}
+  noindex={guide.data.seo?.noindex ?? false}
   ogImage={guide.data.heroImage}
   jsonLd={jsonLd}
 >
