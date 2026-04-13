@@ -21,7 +21,7 @@ const { Content } = entry ? await render(entry) : { Content: null };
     description={entry?.data.description ?? "Get in touch — we'd love to hear from you."}
   />
 
-  <section class="pb-24">
+  <section class="pb-16 md:pb-24">
     <div class="max-w-3xl mx-auto px-6">
       {Content && (
         <Prose class="mb-10">
@@ -87,7 +87,7 @@ const { Content } = entry ? await render(entry) : { Content: null };
           ></textarea>
         </div>
 
-        <Button type="submit" variant="primary" size="lg">Send message</Button>
+        <Button type="submit" variant="primary" size="lg" class="w-full sm:w-auto">Send message</Button>
       </form>
     </div>
   </section>

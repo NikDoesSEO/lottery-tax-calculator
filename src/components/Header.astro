@@ -78,8 +78,20 @@ const isActive = (href: string) =>
 <script>
   const toggle = document.querySelector<HTMLButtonElement>('[data-mobile-menu-toggle]');
   const menu = document.getElementById('mobile-menu');
+
+  const setOpen = (open: boolean) => {
+    if (!menu || !toggle) return;
+    menu.classList.toggle('hidden', !open);
+    toggle.setAttribute('aria-expanded', String(open));
+  };
+
   toggle?.addEventListener('click', () => {
-    const isOpen = menu?.classList.toggle('hidden') === false;
-    toggle.setAttribute('aria-expanded', String(isOpen));
+    setOpen(menu?.classList.contains('hidden') ?? false);
   });
+
+  // Close the mobile menu after a link tap so users aren't stuck looking at
+  // the menu when the page has already navigated.
+  menu?.querySelectorAll('a').forEach((link) =>
+    link.addEventListener('click', () => setOpen(false))
+  );
 </script>

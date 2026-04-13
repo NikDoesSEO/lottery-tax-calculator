@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 type TaxBracket = 'basic' | 'higher' | 'additional';
 
@@ -55,12 +55,25 @@ interface InfoTooltipProps {
 
 function InfoTooltip({ text }: InfoTooltipProps) {
   const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLSpanElement>(null);
+
+  // Close on outside tap/click — hover-only tooltips are broken on touch.
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: PointerEvent) => {
+      if (!wrapperRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', handler);
+    return () => document.removeEventListener('pointerdown', handler);
+  }, [open]);
+
   return (
-    <span className="relative inline-block ml-1 align-middle">
+    <span ref={wrapperRef} className="relative inline-block ml-1 align-middle">
       <button
         type="button"
         aria-label="More info"
-        className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-brand-primary-a30 text-[10px] font-bold text-black cursor-help hover:bg-brand-primary-a50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+        aria-expanded={open}
+        className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-primary-a30 text-[10px] font-bold text-black hover:bg-brand-primary-a50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onFocus={() => setOpen(true)}
@@ -70,7 +83,10 @@ function InfoTooltip({ text }: InfoTooltipProps) {
         i
       </button>
       {open && (
-        <span className="absolute z-10 -right-2 top-6 w-52 p-2 text-xs leading-snug text-white bg-black rounded shadow-lg">
+        <span
+          role="tooltip"
+          className="absolute z-10 right-0 top-7 w-[min(13rem,calc(100vw-2rem))] p-2 text-xs leading-snug text-white bg-black rounded shadow-lg"
+        >
           {text}
         </span>
       )}
@@ -293,7 +309,7 @@ export default function LotteryTaxCalculator() {
             </p>
           </div>
         ) : (
-          <div className="rounded-brand bg-white border border-dashed border-black/20 p-6 md:p-8 flex items-center justify-center min-h-[300px]">
+          <div className="hidden lg:flex rounded-brand bg-white border border-dashed border-black/20 p-6 md:p-8 items-center justify-center min-h-[300px]">
             <p className="text-brand-fg-muted text-center max-w-xs">
               Fill in your details and click <strong className="text-brand-fg">Calculate your tax</strong> to see your
               results here.
