@@ -61,6 +61,15 @@ const allJsonLd = jsonLd
   ? [...globalJsonLd, ...(Array.isArray(jsonLd) ? jsonLd : [jsonLd])]
   : globalJsonLd;
 
+// Escape `<`, `>`, `&` so a literal "</script>" (or similar) inside a CMS
+// string can't break out of the inline <script> block. JSON.stringify alone
+// doesn't escape these.
+const serializeJsonLd = (schema: Record<string, unknown>) =>
+  JSON.stringify(schema)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
+
 const ga4Id = settings.ga4Id;
 const adSenseClient = settings.adSenseClient;
 const ahrefsKey = settings.ahrefsKey;
@@ -109,7 +118,7 @@ const ahrefsKey = settings.ahrefsKey;
 
     <!-- JSON-LD structured data -->
     {allJsonLd.map((schema) => (
-      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+      <script type="application/ld+json" set:html={serializeJsonLd(schema)} />
     ))}
 
     <!-- Google Analytics 4 with Consent Mode v2 — gated by cookie banner -->

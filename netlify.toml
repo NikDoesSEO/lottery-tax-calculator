@@ -1,3 +1,56 @@
 [build]
   command = "npm run build"
   publish = "dist"
+
+# Site-wide security headers.
+# More specific paths below (e.g. /admin/*) override these.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=(), browsing-topics=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://ssl.google-analytics.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://partner.googleadservices.com https://adservice.google.com https://tpc.googlesyndication.com https://analytics.ahrefs.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' data: https://fonts.gstatic.com;
+      img-src 'self' data: https:;
+      connect-src 'self' https://www.google-analytics.com https://*.analytics.google.com https://analytics.google.com https://stats.g.doubleclick.net https://pagead2.googlesyndication.com https://*.googlesyndication.com https://analytics.ahrefs.com;
+      frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self';
+      object-src 'none';
+      upgrade-insecure-requests
+    """
+
+# Admin uses Sveltia CMS (loaded from unpkg) which talks to the GitHub API.
+# Needs its own, looser CSP and should not be framed.
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com;
+      style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com;
+      font-src 'self' data: https://fonts.gstatic.com https://unpkg.com;
+      img-src 'self' data: blob: https:;
+      connect-src 'self' https://api.github.com https://github.com https://unpkg.com https://raw.githubusercontent.com https://*.githubusercontent.com;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self' https://github.com;
+      object-src 'none'
+    """
+
+# Long-cache immutable assets (Astro emits hashed filenames under _astro).
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
