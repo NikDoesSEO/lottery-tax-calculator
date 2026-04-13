@@ -3,7 +3,9 @@ import { getCollection } from 'astro:content';
 
 // Static pages that aren't backed by a content collection entry.
 // Everything listed here is indexable; noindex pages (404, admin) are omitted.
-const STATIC_PATHS = ['/', '/about/', '/contact/', '/faqs/', '/guides/', '/privacy/', '/terms/'];
+// URLs are emitted without trailing slashes to match the existing indexed
+// URLs on the live site (see astro.config.mjs `trailingSlash: 'never'`).
+const STATIC_PATHS = ['/', '/about', '/contact', '/faqs', '/guides', '/privacy', '/terms'];
 
 type Entry = { loc: string; lastmod?: string };
 
@@ -31,12 +33,12 @@ export const GET: APIRoute = async ({ site }) => {
   const entries: Entry[] = [];
 
   for (const path of STATIC_PATHS) {
-    const slug = path.replace(/^\/|\/$/g, '');
+    const slug = path.replace(/^\//, '');
     const updated = pageUpdatedBySlug.get(slug);
 
     let lastmod: string | undefined;
     if (updated) lastmod = toIso(updated);
-    else if ((path === '/' || path === '/guides/') && latestGuideDate) lastmod = toIso(latestGuideDate);
+    else if ((path === '/' || path === '/guides') && latestGuideDate) lastmod = toIso(latestGuideDate);
 
     entries.push({ loc: `${base}${path}`, lastmod });
   }
@@ -44,7 +46,7 @@ export const GET: APIRoute = async ({ site }) => {
   for (const guide of guides) {
     if (guide.data.seo?.noindex) continue;
     entries.push({
-      loc: `${base}/guides/${guide.id}/`,
+      loc: `${base}/guides/${guide.id}`,
       lastmod: toIso(guide.data.date),
     });
   }

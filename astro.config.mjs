@@ -10,6 +10,12 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.lotterytaxcalculator.co.uk',
+  // Match the existing live site: URLs are indexed without trailing slashes,
+  // so keep canonical URLs, sitemap entries, and emitted files aligned with
+  // what Google already has. `build.format: 'file'` emits `about.html`
+  // instead of `about/index.html`; Netlify serves it at `/about`.
+  trailingSlash: 'never',
+  build: { format: 'file' },
   integrations: [react()],
 
   vite: {
